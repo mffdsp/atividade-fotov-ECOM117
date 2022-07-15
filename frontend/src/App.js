@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Button } from '@material-ui/core';
+import TopBar from "./topbar/TopBar"
 
 const todoItems = [
   {
@@ -102,6 +103,7 @@ class App extends Component {
   render() {
     return (
       <main className="container">
+        <TopBar />
         <h1 className="text-black text-uppercase text-center my-4">EDGE</h1>
         <div className="row">
           <Button variant="contained">Default</Button>
