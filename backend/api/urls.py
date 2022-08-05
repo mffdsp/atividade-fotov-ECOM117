@@ -16,10 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from todo import views
+
+from photovoltaic import views as photovoltaic_views
 
 router = routers.DefaultRouter()
-router.register(r'todos', views.TodoView, 'todo')
+router.register(r'pvdata', photovoltaic_views.PVViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
