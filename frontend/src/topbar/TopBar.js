@@ -9,10 +9,10 @@ const pages = ['Dashboard', 'History', 'Settings'];
 
 const useStyles = makeStyles((theme) => ({
   edgeAppBar: {
-    background: '#303030',
+    background: 'white',
   },
   topBarButton: {
-    color: 'white',
+    color: '#008EEA',
   }
 }));
 

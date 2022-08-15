@@ -6,10 +6,10 @@ import Dashboard from "./dashboard/Dashboard"
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: 'flex',
-    height: '100%',
-    flexDirection: 'column',
-    backgroundColor: '#f0f2f5'
+    backgroundColor: '#f0f2f5',
+    flexGrow: 1,
+    height: '100vh',
+    overflow: 'auto',
   }
 }));
 
@@ -18,10 +18,10 @@ function App() {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <Box component="main" className={classes.root}>
       <TopBar />
       <Dashboard />
-    </div>
+    </Box>
   );
 }
 
