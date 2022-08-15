@@ -1,7 +1,5 @@
 from django.db import models
 
-from .pvstring import PVString
-
 class PowerForecast(models.Model):
     timestamp = models.DateTimeField(primary_key=True)
     t1 = models.FloatField(default=0, null=True)

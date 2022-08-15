@@ -1,8 +1,11 @@
+from dataclasses import fields
+from pyexpat import model
 from rest_framework import serializers
 from .models import (
     PVData,
     PVString,
     PowerForecast,
+    YieldDay
 )
 
 class PVStringSerializer(serializers.ModelSerializer):
@@ -21,3 +24,8 @@ class PowerForecastSerializer(serializers.ModelSerializer):
     class Meta:
         model = PowerForecast
         fields = ['timestamp', 't1', 't2', 't3', 't4', 't5']
+
+class YieldDaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = YieldDay
+        fields = ['timestamp', 'yield_day', 'yield_day_forecast']
