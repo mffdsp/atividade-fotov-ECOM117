@@ -2,6 +2,7 @@
 version: "3.2"
 services:
   pgsql:
+    container_name: pgsql
     image: postgres:12-alpine
     environment:
       POSTGRES_USER: softex_forecast
@@ -15,6 +16,7 @@ services:
       - db-net
 
   rabbitmq:
+    container_name: rabbitmq
     image: rabbitmq:3-management
     ports:
       - "15672:15672"
@@ -28,8 +30,8 @@ services:
      - CLUSTERED=true
 
   backend:
-    restart: always
     container_name: backend
+    restart: always
     command : bash -c "python manage.py migrate &&
                       python manage.py runserver 0.0.0.0:8000"
     build:
@@ -44,15 +46,39 @@ services:
       - db-net
 
   frontend:
+    container_name: frontend
     restart: always
     command : npm start
-    container_name: frontend
     build:
       context: ./frontend/
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     stdin_open: true
+    depends_on:
+      - backend
+    networks:
+      - db-net
+
+  worker:
+    container_name: worker
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    volumes:
+      - ./backend:/app/backend
+    command: celery -A api worker --pool=gevent -l info -Q celery
+    depends_on:
+      - backend
+    networks:
+      - db-net
+
+  beat:
+    container_name: beat
+    build: ./backend
+    volumes:
+      - ./backend:/app/backend
+    command: celery -A api beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
     depends_on:
       - backend
     networks:

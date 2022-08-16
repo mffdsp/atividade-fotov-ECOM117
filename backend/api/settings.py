@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +42,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'photovoltaic',
+    'django_celery_beat',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -123,6 +126,15 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 
 USE_TZ = True
+
+CELERY_BROKER_URL = os.environ.get('BROKER_URL', 'amqp://softex_forecast:123456@rabbitmq:5672')
+CELERY_BACKEND_URL = os.environ.get('BROKER_URL', 'amqp://softex_forecast:123456@rabbitmq:5672')
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_RESULT_EXPIRES = timedelta(days=60)
+
+task_default_queue = 'default'
+
+task_routes = {}
 
 
 # Static files (CSS, JavaScript, Images)
