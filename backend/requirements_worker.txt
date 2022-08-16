@@ -7,4 +7,5 @@ django-celery-beat==2.0.0
 django-celery-results==2.0.1
 django-timezone-field==4.2.1
 python-crontab==2.6.0
+pandas
 gevent==21.1.2

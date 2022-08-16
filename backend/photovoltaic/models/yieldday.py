@@ -6,4 +6,4 @@ class YieldDay(models.Model):
     yield_day_forecast = models.FloatField(default=0, null=True)
 
     def __str__(self):
-        return self.timestamp
+        return str(self.timestamp) + " " + str(self.yield_day) + " " + str(self.yield_day_forecast)
