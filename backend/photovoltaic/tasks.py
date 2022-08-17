@@ -5,7 +5,7 @@ from datetime import datetime
 
 from .util import read_dat_file
 
-from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay
+from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth
 
 # def createNotification(self, exc, task_id, args, kwargs, einfo):
 #     notification = Notification.create(title="Erro em tarefa de background.", message="Erro na execução da tarefa {task}: {einfo}".format(task=task_id, einfo=einfo), link='/nlp/admin/logs/')
@@ -41,9 +41,20 @@ def simulate_input(self):
 
     data.strings.set([s1, s2])
 
+    energy = df_row['Potencia_FV_Avg']*(1/60)/1000
+
     day = datetime_now.replace(hour=0, minute=0, second=0, microsecond=0)
     yield_day, created = YieldDay.objects.get_or_create(timestamp=day)
-    energy = df_row['Potencia_FV_Avg']*(1/60)/1000
-    yield_day.yield_day = yield_day.yield_day + energy
+    yield_day.yield_day = yield_day.yield_day + energy #kWh
     yield_day.save()
+
+    month = day.replace(day=1)
+    yield_month, created = YieldMonth.objects.get_or_create(timestamp=month)
+    yield_month.yield_month = yield_month.yield_month + energy #kWh
+    yield_month.save()
+
+    # year = month.replace(month==1)
+    # yield_year, created = YieldYear.objects.get_or_create(timestamp=year)
+    # yield_year.yield_year = yield_year.yield_year + (energy/1000) #MWh
+    # yield_year.save()
 
