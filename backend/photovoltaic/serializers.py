@@ -6,7 +6,8 @@ from .models import (
     PVString,
     PowerForecast,
     YieldDay,
-    YieldMonth
+    YieldMonth,
+    YieldYear
 )
 
 class PVStringSerializer(serializers.ModelSerializer):
@@ -35,3 +36,8 @@ class YieldMonthSerializer(serializers.ModelSerializer):
     class Meta:
         model = YieldMonth
         fields = ['timestamp', 'yield_month', 'yield_month_forecast']
+
+class YieldYearSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = YieldYear
+        fields = ['timestamp', 'yield_year', 'yield_year_forecast']

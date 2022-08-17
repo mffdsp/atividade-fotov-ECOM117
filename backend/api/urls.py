@@ -24,6 +24,7 @@ router.register(r'pvdata', photovoltaic_views.PVViewSet)
 router.register(r'powerforecast', photovoltaic_views.PowerForecastSet)
 router.register(r'yieldday', photovoltaic_views.YieldDaySet)
 router.register(r'yieldmonth', photovoltaic_views.YieldMonthSet)
+router.register(r'yieldyear', photovoltaic_views.YieldYearSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

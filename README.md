@@ -17,4 +17,11 @@ If this is your first time deploying the project, you should follow the steps be
    - Test base (3 MB) - https://drive.google.com/file/d/1rPe2IlhOtALpPcjzeP-zLbujPSX8CWND/view?usp=sharing
    <!-- - All years (795 MB) - https://drive.google.com/file/d/1Ne9b_Mv0qp1ImplhGeUuO4pvkTM0-J6P/view?usp=sharing
    - 2021 (286 MB) - https://drive.google.com/file/d/1iTPnPmYXK7hf_k4qasRIPR1ih7nu6j6w/view?usp=sharing -->
-4. Load backup data, run ```python manage.py loaddata base_name.json``` to load it into your database.  
+4. Load backup data, run ```python manage.py loaddata base_name.json``` to load it into your database.
+
+You can run a task to simulate the input of PV data in the Django admin page
+1. Go to http://localhost:8000/admin 
+2. In Periodic tasks click on the Add button
+3. Put a name of your choice and select "photovoltaic.tasks.simulate_input" in Task (registered)
+4. Create a 1-minute Interval Schedule
+5. Lastly, save

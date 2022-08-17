@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 
-from .serializers import PVDataSerializer, PowerForecastSerializer, YieldDaySerializer, YieldMonthSerializer
-from .models import PVData, PowerForecast, YieldDay, YieldMonth
+from .serializers import PVDataSerializer, PowerForecastSerializer, YieldDaySerializer, YieldMonthSerializer, YieldYearSerializer
+from .models import PVData, PowerForecast, YieldDay, YieldMonth, YieldYear
 
 # Create your views here.
 
@@ -21,3 +21,7 @@ class YieldDaySet(viewsets.ModelViewSet):
 class YieldMonthSet(viewsets.ModelViewSet):
     serializer_class = YieldMonthSerializer
     queryset = YieldMonth.objects.all()
+
+class YieldYearSet(viewsets.ModelViewSet):
+    serializer_class = YieldYearSerializer
+    queryset = YieldYear.objects.all()
