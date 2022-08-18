@@ -134,7 +134,7 @@ CELERY_RESULT_EXPIRES = timedelta(days=60)
 
 task_default_queue = 'default'
 
-task_routes = {}
+task_routes = {'photovoltaic.tasks.simulate_model': {'queue': 'model'}}
 
 
 # Static files (CSS, JavaScript, Images)

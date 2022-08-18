@@ -67,7 +67,7 @@ services:
       dockerfile: Dockerfile-worker
     volumes:
       - ./backend:/app/backend
-    command: celery -A api worker --pool=gevent -l info -Q celery
+    command: celery -A api worker --pool=gevent -l info -Q celery,model
     depends_on:
       - backend
     networks:

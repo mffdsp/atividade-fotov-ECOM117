@@ -11,4 +11,4 @@ class PVData(models.Model):
     strings = models.ManyToManyField(PVString)
 
     def __str__(self):
-        return self.timestamp
+        return str(self.timestamp) + " " + str(self.irradiation) + " " + str(self.temperature_pv) + " " + str(self.temperature_amb) + " " + str(self.power_avg)

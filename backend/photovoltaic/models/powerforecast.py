@@ -9,4 +9,4 @@ class PowerForecast(models.Model):
     t5 = models.FloatField(default=0, null=True)
 
     def __str__(self):
-        return self.timestamp
+        return str(self.timestamp) + " " + str(self.t1) + " " + str(self.t2) + " " + str(self.t3) + " " + str(self.t4) + " " + str(self.t5)

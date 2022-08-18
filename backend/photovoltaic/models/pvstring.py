@@ -9,4 +9,4 @@ class PVString(models.Model):
     power = models.FloatField(default=0, null=True)
 
     def __str__(self):
-        return self.name
+        return self.name + " " + str(self.voltage) + " " + str(self.current) + " " + str(self.power)
