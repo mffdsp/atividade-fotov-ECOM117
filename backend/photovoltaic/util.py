@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import datetime, timedelta
 
 def read_dat_file(filename):
     """
@@ -25,3 +26,55 @@ def read_dat_file(filename):
             df[column] = df[column].astype('float')
     # Drop column 'RECORD' (if present) because from june 2019 is is no longer used
     return df
+
+def get_time_inteval(request):
+    return request.GET.get('timeInterval', 10)
+
+def generate_forecast_json(data):
+    length = len(data)
+
+    if length == 0:
+        return []
+
+    json_array = []
+    for i in range(1, length):
+        json_data = {
+            'timestamp': data[i]['timestamp'],
+            'forecast': data[i-1]['t1']
+        }
+        json_array.append(json_data)
+
+    latest_data = data[length-1]
+    datetime_forecast = datetime.strptime(latest_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f-03:00')
+
+    datetime_forecast = datetime_forecast + timedelta(minutes=1)
+    json_array.append({
+        'timestamp': datetime_forecast.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'),
+        'forecast': latest_data['t1']
+    })
+
+    datetime_forecast = datetime_forecast + timedelta(minutes=1)
+    json_array.append({
+        'timestamp': datetime_forecast.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'),
+        'forecast': latest_data['t2']
+    })
+
+    datetime_forecast = datetime_forecast + timedelta(minutes=1)
+    json_array.append({
+        'timestamp': datetime_forecast.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'),
+        'forecast': latest_data['t3']
+    })
+
+    datetime_forecast = datetime_forecast + timedelta(minutes=1)
+    json_array.append({
+        'timestamp': datetime_forecast.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'),
+        'forecast': latest_data['t4']
+    })
+
+    datetime_forecast = datetime_forecast + timedelta(minutes=1)
+    json_array.append({
+        'timestamp': datetime_forecast.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'),
+        'forecast': latest_data['t5']
+    })
+
+    return json_array

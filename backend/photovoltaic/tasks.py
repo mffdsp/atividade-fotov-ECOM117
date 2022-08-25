@@ -7,7 +7,7 @@ import random
 
 from .util import read_dat_file
 
-from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth, YieldYear
+from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth, YieldYear, YieldMinute
 
 @shared_task(bind=True, max_retries=3)
 def simulate_input(self):
@@ -48,7 +48,13 @@ def simulate_input(self):
     day = datetime_now.replace(hour=0, minute=0, second=0, microsecond=0)
     yield_day, created = YieldDay.objects.get_or_create(timestamp=day)
     yield_day.yield_day = yield_day.yield_day + energy #kWh
+    yield_day.yield_day_forecaste = 30
     yield_day.save()
+
+    yield_minute, created = YieldMinute.objects.get_or_create(timestamp=datetime_now)
+    yield_minute.yield_minute = yield_day.yield_day #kWh
+    yield_minute.yield_day_forecaste = 30
+    yield_minute.save()
 
     month = day.replace(day=1)
     yield_month, created = YieldMonth.objects.get_or_create(timestamp=month)
@@ -76,3 +82,8 @@ def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
                                     t3=power3 + random.uniform(0.6, 1.6),
                                     t4=power4 + random.uniform(0.9, 1.9),
                                     t5=power5 + random.uniform(1.2, 2.2))
+
+
+# @shared_task(bind=True, max_retries=3)
+# def calculate_alerts_tresholds(self):
+#     pass

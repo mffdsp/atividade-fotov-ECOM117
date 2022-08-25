@@ -20,11 +20,12 @@ from rest_framework import routers
 from photovoltaic import views as photovoltaic_views
 
 router = routers.DefaultRouter()
-router.register(r'pvdata', photovoltaic_views.PVViewSet)
-router.register(r'powerforecast', photovoltaic_views.PowerForecastSet)
-router.register(r'yieldday', photovoltaic_views.YieldDaySet)
-router.register(r'yieldmonth', photovoltaic_views.YieldMonthSet)
-router.register(r'yieldyear', photovoltaic_views.YieldYearSet)
+router.register(r'pvdata', photovoltaic_views.PVDataViewSet)
+router.register(r'powerforecast', photovoltaic_views.PowerForecastViewSet)
+router.register(r'yieldday', photovoltaic_views.YieldDayViewSet)
+router.register(r'yieldmonth', photovoltaic_views.YieldMonthViewSet)
+router.register(r'yieldyear', photovoltaic_views.YieldYearViewSet)
+router.register(r'yieldminute', photovoltaic_views.YieldMinuteViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
