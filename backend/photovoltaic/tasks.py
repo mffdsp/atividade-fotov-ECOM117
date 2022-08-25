@@ -84,6 +84,6 @@ def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
                                     t5=power5 + random.uniform(1.2, 2.2))
 
 
-# @shared_task(bind=True, max_retries=3)
-# def calculate_alerts_tresholds(self):
-#     pass
+@shared_task(bind=True, max_retries=3)
+def calculate_alerts_tresholds(self):
+    pass
