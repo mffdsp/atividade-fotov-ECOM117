@@ -2,15 +2,12 @@ from celery import shared_task
 from celery.execute import send_task
 
 from datetime import datetime
+import numpy as np
 import random
 
 from .util import read_dat_file
 
 from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth, YieldYear
-
-# def createNotification(self, exc, task_id, args, kwargs, einfo):
-#     notification = Notification.create(title="Erro em tarefa de background.", message="Erro na execução da tarefa {task}: {einfo}".format(task=task_id, einfo=einfo), link='/nlp/admin/logs/')
-#     notification.save()
 
 @shared_task(bind=True, max_retries=3)
 def simulate_input(self):
@@ -26,12 +23,18 @@ def simulate_input(self):
                                 timestamp=datetime_now,
                                 voltage=df_row['Tensao_S1_Avg'],
                                 current=df_row['Corrente_S1_Avg'],
-                                power=df_row['Potencia_S1_Avg'])
+                                power=df_row['Potencia_S1_Avg'],
+                                voltage_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]),
+                                current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]))
+    
     s2 = PVString.objects.create(name="S2 " + str(datetime_now),
                                 timestamp=datetime_now,
                                 voltage=df_row['Tensao_S2_Avg'],
                                 current=df_row['Corrente_S2_Avg'],
-                                power=df_row['Potencia_S2_Avg'])
+                                power=df_row['Potencia_S2_Avg'],
+                                voltage_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]),
+                                current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]))
+
     data = PVData.objects.create(timestamp=datetime.now(),
                                 irradiation=df_row['Radiacao_Avg'],
                                 temperature_pv=df_row['Temp_Cel_Avg'],
