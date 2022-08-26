@@ -14,7 +14,7 @@ from .models import (
 class PVStringSerializer(serializers.ModelSerializer):
     class Meta:
         model = PVString
-        fields = ['name', 'timestamp', 'voltage', 'current', 'power', 'voltage_alert', 'current_alert']
+        fields = ['name', 'timestamp', 'voltage', 'current', 'power', 'voltage_alert', 'current_alert', 'string_number']
 
 class PVDataSerializer(serializers.ModelSerializer):
     strings = PVStringSerializer(read_only=True, many=True)

@@ -21,6 +21,7 @@ from photovoltaic import views as photovoltaic_views
 
 router = routers.DefaultRouter()
 router.register(r'pvdata', photovoltaic_views.PVDataViewSet)
+router.register(r'pvstring', photovoltaic_views.PVStringViewSet)
 router.register(r'powerforecast', photovoltaic_views.PowerForecastViewSet)
 router.register(r'yieldday', photovoltaic_views.YieldDayViewSet)
 router.register(r'yieldmonth', photovoltaic_views.YieldMonthViewSet)

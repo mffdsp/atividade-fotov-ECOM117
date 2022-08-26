@@ -27,7 +27,8 @@ def simulate_input(self):
                                 current=df_row['Corrente_S1_Avg'],
                                 power=df_row['Potencia_S1_Avg'],
                                 voltage_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.88, 0.10, 0.02]),
-                                current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.88, 0.10, 0.02]))
+                                current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.88, 0.10, 0.02]),
+                                string_number=1)
     
     s2 = PVString.objects.create(name="S2 " + str(datetime_now),
                                 timestamp=datetime_now,
@@ -35,7 +36,8 @@ def simulate_input(self):
                                 current=df_row['Corrente_S2_Avg'],
                                 power=df_row['Potencia_S2_Avg'],
                                 voltage_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]),
-                                current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]))
+                                current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]),
+                                string_number=2)
 
     data = PVData.objects.create(timestamp=datetime_now,
                                 irradiation=df_row['Radiacao_Avg'],

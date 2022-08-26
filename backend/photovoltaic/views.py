@@ -6,10 +6,14 @@ from pytz import timezone
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-from .util import get_time_inteval, generate_forecast_json
+from .util import (get_time_inteval,
+    get_time_range,
+    get_string_number,
+    generate_forecast_json)
 
 from .serializers import (
     PVDataSerializer,
+    PVStringSerializer,
     PVDataMeteorologicalSerializer,
     PVDataPowerSerializer,
     PowerForecastSerializer,
@@ -19,6 +23,7 @@ from .serializers import (
     YieldMinuteSerializer)
 from .models import (
     PVData,
+    PVString,
     PowerForecast,
     YieldDay,
     YieldMonth,
@@ -86,6 +91,31 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
         return Response(PVDataPowerSerializer(power_data, many=True).data)
 
+    @action(methods=['GET'], url_path='history', detail=False)
+    def pv_data_history(self, request):
+        time_begin, time_end = get_time_range(request)
+
+        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        pv_data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+
+        return Response(PVDataSerializer(pv_data, many=True).data)
+
+class PVStringViewSet(viewsets.ModelViewSet):
+    queryset = PVString.objects.all()
+    serializer_class = PVStringSerializer
+
+    @action(methods=['GET'], url_path='history', detail=False)
+    def pv_string_history(self, request):
+        number = get_string_number(request)
+        time_begin, time_end = get_time_range(request)
+
+        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        pv_data = PVString.objects.filter(string_number=number, timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+
+        return Response(PVStringSerializer(pv_data, many=True).data)
+
 class PowerForecastViewSet(viewsets.ModelViewSet):
     queryset = PowerForecast.objects.all()
     serializer_class = PowerForecastSerializer
@@ -103,6 +133,16 @@ class PowerForecastViewSet(viewsets.ModelViewSet):
         forecast_json = generate_forecast_json(PowerForecastSerializer(power_forecast, many=True).data)
 
         return Response(forecast_json)
+
+    @action(methods=['GET'], url_path='history', detail=False)
+    def power_forecast_history(self, request):
+        time_begin, time_end = get_time_range(request)
+
+        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        forecast_data = PowerForecast.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+
+        return Response(PowerForecastSerializer(forecast_data, many=True).data)
 
 class YieldDayViewSet(viewsets.ModelViewSet):
     queryset = YieldDay.objects.all()
@@ -123,6 +163,16 @@ class YieldDayViewSet(viewsets.ModelViewSet):
 
         return Response(YieldDaySerializer(yield_days, many=True).data)
 
+    @action(methods=['GET'], url_path='history', detail=False)
+    def yield_day_history(self, request):
+        time_begin, time_end = get_time_range(request)
+
+        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        yield_data = YieldDay.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+
+        return Response(YieldDaySerializer(yield_data, many=True).data)
+
 class YieldMonthViewSet(viewsets.ModelViewSet):
     queryset = YieldMonth.objects.all()
     serializer_class = YieldMonthSerializer
@@ -136,6 +186,16 @@ class YieldMonthViewSet(viewsets.ModelViewSet):
         yield_months = YieldMonth.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
         return Response(YieldMonthSerializer(yield_months, many=True).data)
+
+    @action(methods=['GET'], url_path='history', detail=False)
+    def yield_month_history(self, request):
+        time_begin, time_end = get_time_range(request)
+
+        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        yield_data = YieldMonth.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+
+        return Response(YieldMonthSerializer(yield_data, many=True).data)
 
 class YieldYearViewSet(viewsets.ModelViewSet):
     queryset = YieldYear.objects.all()
@@ -151,6 +211,16 @@ class YieldYearViewSet(viewsets.ModelViewSet):
 
         return Response(YieldYearSerializer(yield_year, many=True).data)
 
+    @action(methods=['GET'], url_path='history', detail=False)
+    def yield_year_history(self, request):
+        time_begin, time_end = get_time_range(request)
+
+        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        yield_data = YieldYear.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+
+        return Response(YieldYearSerializer(yield_data, many=True).data)
+
 class YieldMinuteViewSet(viewsets.ModelViewSet):
     queryset = YieldMinute.objects.all()
     serializer_class = YieldMinuteSerializer
@@ -163,3 +233,13 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
         yield_today = YieldMinute.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
         return Response(YieldMinuteSerializer(yield_today, many=True).data)
+
+    @action(methods=['GET'], url_path='history', detail=False)
+    def yield_minute_history(self, request):
+        time_begin, time_end = get_time_range(request)
+
+        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        yield_data = YieldMinute.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+
+        return Response(YieldMinuteSerializer(yield_data, many=True).data)
