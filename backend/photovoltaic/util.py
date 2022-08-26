@@ -28,7 +28,15 @@ def read_dat_file(filename):
     return df
 
 def get_time_inteval(request):
-    return request.GET.get('timeInterval', 10)
+    return request.GET.get('time_interval', 10)
+
+def get_time_range(request):
+    time_end = request.GET.get('time_end', datetime.now())
+    time_begin = request.GET.get('time_begin', datetime.now() - timedelta(days=1))
+    return time_begin, time_end
+
+def get_string_number(request):
+    return request.GET.get('string_number', 1)
 
 def generate_forecast_json(data):
     length = len(data)
