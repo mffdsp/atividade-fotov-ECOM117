@@ -20,7 +20,8 @@ from .serializers import (
     YieldDaySerializer,
     YieldMonthSerializer,
     YieldYearSerializer,
-    YieldMinuteSerializer)
+    YieldMinuteSerializer,
+    AlertTresholdSerializer)
 from .models import (
     PVData,
     PVString,
@@ -28,7 +29,8 @@ from .models import (
     YieldDay,
     YieldMonth,
     YieldYear,
-    YieldMinute)
+    YieldMinute,
+    AlertTreshold)
 
 # Create your views here.
 
@@ -243,3 +245,7 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
         yield_data = YieldMinute.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
 
         return Response(YieldMinuteSerializer(yield_data, many=True).data)
+
+class AlertTresholdViewSet(viewsets.ModelViewSet):
+    queryset = AlertTreshold.objects.all()
+    serializer_class = AlertTresholdSerializer

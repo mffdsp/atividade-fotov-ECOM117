@@ -8,7 +8,8 @@ from .models import (
     YieldDay,
     YieldMonth,
     YieldYear,
-    YieldMinute
+    YieldMinute,
+    AlertTreshold
 )
 
 class PVStringSerializer(serializers.ModelSerializer):
@@ -57,3 +58,8 @@ class YieldMinuteSerializer(serializers.ModelSerializer):
     class Meta:
         model = YieldMinute
         fields = ['timestamp', 'yield_minute', 'yield_day_forecast']
+
+class AlertTresholdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlertTreshold
+        fields = ['id', 'alert_type', 'string_number', 'meteorological_value', 'treshold_wa_max', 'treshold_wa_min', 'treshold_ft_max', 'treshold_ft_min']

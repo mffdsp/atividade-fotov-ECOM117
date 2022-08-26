@@ -1,14 +1,17 @@
+from calendar import month
+import json
+import string
 from celery import shared_task
-from celery.execute import send_task
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone
 import numpy as np
 import random
 
 from .util import read_dat_file
 
-from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth, YieldYear, YieldMinute
+from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth, YieldYear, YieldMinute, AlertTreshold
+from photovoltaic.serializers import PVDataSerializer
 
 @shared_task(bind=True, max_retries=3)
 def simulate_input(self):
@@ -90,4 +93,70 @@ def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
 
 @shared_task(bind=True, max_retries=3)
 def calculate_alerts_tresholds(self):
-    pass
+    now = datetime.now()
+    yesterday = now - timedelta(days=1)
+    datetime_lte = yesterday.strftime('%Y-%m-%dT23:59:59.999999-03:00')
+    month_before = yesterday - timedelta(days=30)
+    datetime_gte = month_before.strftime('%Y-%m-%dT00:00:00.000000-03:00')
+    pv_data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte, irradiation__gte=120)
+
+    length = len(pv_data)
+    json_data = PVDataSerializer(pv_data[0]).data
+    number_strings = len(json_data['strings'])
+
+    data_ordered_irrad = pv_data.order_by('irradiation')
+    data_ordered_temp = pv_data.order_by('temperature_pv')
+
+    min_irrad = round(data_ordered_irrad[0].irradiation)
+    max_irrad = round(data_ordered_irrad[length-1].irradiation)
+    min_temp = round(data_ordered_temp[0].temperature_pv)
+    max_temp = round(data_ordered_temp[length-1].temperature_pv)
+
+    fault = 98
+    warning = 85
+
+    delta = 5
+    for value in range(min_irrad, max_irrad+1):
+        data_filtered = pv_data.filter(irradiation__gte = value - delta, irradiation__lte = value + delta)
+
+        voltage_data = np.zeros((number_strings, data_filtered.count()))
+
+        for i in range(0, data_filtered.count()):
+            for j in range(0, number_strings):
+                voltage_data[j][i] = data_filtered[i].strings.all()[j].voltage
+    
+        for string_number in range(0, number_strings):
+            if(len(voltage_data[string_number]) > 0):
+                th = np.percentile(voltage_data[string_number], [fault, 100-fault, warning, 100-warning])
+                
+                alert_th, created = AlertTreshold.objects.get_or_create(alert_type='VT', string_number=string_number+1, meteorological_value=value)
+                alert_th.treshold_ft_max = th[0]
+                alert_th.treshold_ft_min = th[1]
+                alert_th.treshold_wa_max = th[2]
+                alert_th.treshold_wa_min = th[3]
+                alert_th.save()
+
+    delta = 1
+    for value in range(min_temp, max_temp+1):
+        data_filtered = pv_data.filter(temperature_pv__gte = value - delta, temperature_pv__lte = value + delta)
+
+        current_data = np.zeros((number_strings, data_filtered.count()))
+
+        for i in range(0, data_filtered.count()):
+            for j in range(0, number_strings):
+                current_data[j][i] = data_filtered[i].strings.all()[j].current
+    
+        for string_number in range(0, number_strings):
+            if(len(current_data[string_number]) > 0):
+                th = np.percentile(current_data[string_number], [fault, 100-fault, warning, 100-warning])
+
+                alert_th, created = AlertTreshold.objects.get_or_create(alert_type='CR', string_number=string_number+1, meteorological_value=value)
+                alert_th.treshold_ft_max = th[0]
+                alert_th.treshold_ft_min = th[1]
+                alert_th.treshold_wa_max = th[2]
+                alert_th.treshold_wa_min = th[3]
+                alert_th.save()
+
+
+
+
