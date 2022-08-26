@@ -1,4 +1,3 @@
-from unicodedata import name
 from django.db import models
 
 class PVString(models.Model):
@@ -7,7 +6,6 @@ class PVString(models.Model):
         ('WA', 'Warning'),
         ('FT', 'Fault'),
     ]
-
 
     name = models.CharField(max_length=1024, primary_key=True)
     timestamp = models.DateTimeField()

@@ -2,6 +2,7 @@ from celery import shared_task
 from celery.execute import send_task
 
 from datetime import datetime
+from pytz import timezone
 import numpy as np
 import random
 
@@ -13,7 +14,8 @@ from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, Yield
 def simulate_input(self):
     df = read_dat_file("./photovoltaic/fixtures/test_day.dat")
 
-    datetime_now = datetime.now()
+    tz = timezone('America/Sao_Paulo')
+    datetime_now = tz.localize(datetime.now())
 
     index = datetime_now.hour*60 + datetime_now.minute
 
@@ -24,8 +26,8 @@ def simulate_input(self):
                                 voltage=df_row['Tensao_S1_Avg'],
                                 current=df_row['Corrente_S1_Avg'],
                                 power=df_row['Potencia_S1_Avg'],
-                                voltage_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]),
-                                current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]))
+                                voltage_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.88, 0.10, 0.02]),
+                                current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.88, 0.10, 0.02]))
     
     s2 = PVString.objects.create(name="S2 " + str(datetime_now),
                                 timestamp=datetime_now,
@@ -35,7 +37,7 @@ def simulate_input(self):
                                 voltage_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]),
                                 current_alert=np.random.choice(['NM', 'WA', 'FT'], p=[0.83, 0.15, 0.02]))
 
-    data = PVData.objects.create(timestamp=datetime.now(),
+    data = PVData.objects.create(timestamp=datetime_now,
                                 irradiation=df_row['Radiacao_Avg'],
                                 temperature_pv=df_row['Temp_Cel_Avg'],
                                 temperature_amb=df_row['Temp_Amb_Avg'],

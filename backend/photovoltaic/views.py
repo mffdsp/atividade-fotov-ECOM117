@@ -2,6 +2,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets
 
+from pytz import timezone
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -29,6 +30,34 @@ from .models import (
 class PVDataViewSet(viewsets.ModelViewSet):
     queryset = PVData.objects.all()
     serializer_class = PVDataSerializer
+
+    @action(methods=['GET'], url_path='status', detail=False)
+    def pv_system_status(self, request):
+        latest_data = PVDataSerializer(PVData.objects.latest('timestamp')).data
+
+        print(latest_data)
+
+        time_now = datetime.now()
+        time_data = datetime.strptime(latest_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f-03:00')
+        delta = time_now - time_data
+        minutes = delta / timedelta(minutes=1)
+
+        status = 'Normal Operation'
+        if(minutes >= 3):
+            status = 'Offline'
+        else:
+            for string in latest_data['strings']:
+                if string['voltage_alert'] == 'WA' or string['current_alert'] == 'WA':
+                    status = 'Warning Operation'
+                if string['voltage_alert'] == 'FT' or string['current_alert'] == 'FT':
+                    status = 'Fault Operation'
+                    break
+        
+        json_response = {
+            'status': status
+        }
+
+        return Response(json_response)
 
     @action(methods=['GET'], url_path='latest', detail=False)
     def pv_data_latest(self, request):
