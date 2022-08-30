@@ -1,5 +1,3 @@
-from dataclasses import fields
-from pyexpat import model
 from rest_framework import serializers
 from .models import (
     PVData,
@@ -9,7 +7,8 @@ from .models import (
     YieldMonth,
     YieldYear,
     YieldMinute,
-    AlertTreshold
+    AlertTreshold,
+    Settings
 )
 
 class PVStringSerializer(serializers.ModelSerializer):
@@ -63,3 +62,9 @@ class AlertTresholdSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlertTreshold
         fields = ['id', 'alert_type', 'string_number', 'meteorological_value', 'treshold_wa_max', 'treshold_wa_min', 'treshold_ft_max', 'treshold_ft_min']
+
+class SettingaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Settings
+        fields = ['id', 'fault_vt_percentile', 'warning_vt_percentile', 'delt_vt', 'fault_cr_percentile', 'warning_cr_percentile', 'delt_cr',
+                'fault_user_active', 'warning_user_active', 'alert_days_active', 'days_left', 'retraining_interval']

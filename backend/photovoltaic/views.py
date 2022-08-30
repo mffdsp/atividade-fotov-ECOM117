@@ -1,3 +1,4 @@
+from venv import create
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -21,7 +22,8 @@ from .serializers import (
     YieldMonthSerializer,
     YieldYearSerializer,
     YieldMinuteSerializer,
-    AlertTresholdSerializer)
+    AlertTresholdSerializer,
+    SettingaSerializer)
 from .models import (
     PVData,
     PVString,
@@ -30,7 +32,8 @@ from .models import (
     YieldMonth,
     YieldYear,
     YieldMinute,
-    AlertTreshold)
+    AlertTreshold,
+    Settings)
 
 # Create your views here.
 
@@ -249,3 +252,48 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
 class AlertTresholdViewSet(viewsets.ModelViewSet):
     queryset = AlertTreshold.objects.all()
     serializer_class = AlertTresholdSerializer
+
+class SettingsViewSet(viewsets.ModelViewSet):
+    queryset = Settings.objects.all()
+    serializer_class = SettingaSerializer
+
+    @action(methods=['POST'], url_path='setalertsettings', detail=False)
+    def set_alert_settings(self, request):
+
+        st, created = Settings.objects.get_or_create(id=1)
+
+        st.fault_vt_percentile = request.GET.get('fault_vt_percentile', st.fault_vt_percentile)
+        st.warning_vt_percentile = request.GET.get('warning_vt_percentile', st.warning_vt_percentile)
+        st.delt_vt = request.GET.get('delt_vt', st.delt_vt)
+
+        st.fault_cr_percentile = request.GET.get('fault_cr_percentile', st.fault_cr_percentile)
+        st.warning_cr_percentile = request.GET.get('warning_cr_percentile', st.warning_cr_percentile)
+        st.delt_cr = request.GET.get('delt_cr', st.delt_cr)
+
+        return Response(status=200)
+
+    @action(methods=['POST'], url_path='setalertactive', detail=False)
+    def set_alert_active(self, request):
+
+        st, created = Settings.objects.get_or_create(id=1)
+
+        st.fault_user_active = request.GET.get('fault_user_active', st.fault_user_active)
+        st.warning_user_active = request.GET.get('warning_user_active', st.warning_user_active)
+
+        return Response(status=200)
+
+    @action(methods=['POST'], url_path='setretraininginterval', detail=False)
+    def set_retraining_interval(self, request):
+
+        st, created = Settings.objects.get_or_create(id=1)
+
+        st.retraining_interval = request.GET.get('retraining_interval', st.retraining_interval)
+
+        return Response(status=200)
+
+    @action(methods=['GET'], url_path='daysleft', detail=False)
+    def days_left_alert(self, request):
+
+        st, created = Settings.objects.get_or_create(id=1)
+
+        return Response({'days_left': st.days_left})

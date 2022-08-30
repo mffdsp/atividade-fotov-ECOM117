@@ -1,5 +1,3 @@
-from pyexpat import model
-import string
 from django.db import models
 
 class AlertTreshold(models.Model):
