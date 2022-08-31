@@ -1,3 +1,4 @@
+import json
 from venv import create
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -11,6 +12,8 @@ from .util import (get_time_inteval,
     get_time_range,
     get_string_number,
     generate_forecast_json)
+
+from .tasks import set_data
 
 from .serializers import (
     PVDataSerializer,
@@ -297,3 +300,13 @@ class SettingsViewSet(viewsets.ModelViewSet):
         st, created = Settings.objects.get_or_create(id=1)
 
         return Response({'days_left': st.days_left})
+
+class ExternalAPIViweSet(viewsets.ViewSet):
+    @action(methods=['POST'], url_path='postdata', detail=False)
+    def post_data(self, request):
+
+        request_data = request.data
+
+        set_data.apply_async(args=[request_data], kwargs={}, queue='input_data')
+
+        return Response(status=200)

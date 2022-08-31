@@ -172,3 +172,8 @@ def calculate_alerts_tresholds(self):
 
         st.alert_days_active = True
         st.save()
+
+
+@shared_task(bind=True, max_retries=3)
+def set_data(self, request_data):
+    print(request_data)

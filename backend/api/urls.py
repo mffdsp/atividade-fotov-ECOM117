@@ -30,7 +30,11 @@ router.register(r'yieldminute', photovoltaic_views.YieldMinuteViewSet)
 router.register(r'alerttreshold', photovoltaic_views.AlertTresholdViewSet)
 router.register(r'settings', photovoltaic_views.SettingsViewSet)
 
+external = routers.DefaultRouter()
+external.register(r'apiactions', photovoltaic_views.ExternalAPIViweSet, basename='apiactions')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('externalapi/', include(external.urls)),
 ]
