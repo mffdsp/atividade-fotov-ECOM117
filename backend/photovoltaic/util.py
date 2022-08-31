@@ -28,11 +28,11 @@ def read_dat_file(filename):
     return df
 
 def get_time_inteval(request):
-    return request.GET.get('time_interval', 10)
+    return int(request.GET.get('time_interval', 10))
 
 def get_time_range(request):
-    time_end = request.GET.get('time_end', datetime.now())
-    time_begin = request.GET.get('time_begin', datetime.now() - timedelta(days=1))
+    time_end = request.GET.get('time_end', datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'))
+    time_begin = request.GET.get('time_begin', (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%S.%f-03:00'))
     return time_begin, time_end
 
 def get_string_number(request):

@@ -77,8 +77,8 @@ class PVDataViewSet(viewsets.ModelViewSet):
         latest_data = PVData.objects.latest('timestamp')
         return Response(PVDataSerializer(latest_data).data)
 
-    @action(methods=['GET'], url_path='meteorologicalhistory', detail=False)
-    def meteorological_history(self, request):
+    @action(methods=['GET'], url_path='meteorologicalday', detail=False)
+    def meteorological_day(self, request):
         now = datetime.now()
         datetime_lte = now.strftime('%Y-%m-%dT%H:%M:%S.%f-03:00')
         yesterday = now - timedelta(days=1)
@@ -87,8 +87,8 @@ class PVDataViewSet(viewsets.ModelViewSet):
 
         return Response(PVDataMeteorologicalSerializer(day_data, many=True).data)
 
-    @action(methods=['GET'], url_path='powerhistory', detail=False)
-    def power_history(self, request):
+    @action(methods=['GET'], url_path='powerday', detail=False)
+    def power_day(self, request):
         time_interval = get_time_inteval(request)
 
         now = datetime.now()
@@ -103,9 +103,7 @@ class PVDataViewSet(viewsets.ModelViewSet):
     def pv_data_history(self, request):
         time_begin, time_end = get_time_range(request)
 
-        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        pv_data = PVData.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        pv_data = PVData.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
 
         return Response(PVDataSerializer(pv_data, many=True).data)
 
@@ -118,9 +116,7 @@ class PVStringViewSet(viewsets.ModelViewSet):
         number = get_string_number(request)
         time_begin, time_end = get_time_range(request)
 
-        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        pv_data = PVString.objects.filter(string_number=number, timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        pv_data = PVString.objects.filter(string_number=number, timestamp__gte=time_begin, timestamp__lte=time_end)
 
         return Response(PVStringSerializer(pv_data, many=True).data)
 
@@ -128,8 +124,8 @@ class PowerForecastViewSet(viewsets.ModelViewSet):
     queryset = PowerForecast.objects.all()
     serializer_class = PowerForecastSerializer
 
-    @action(methods=['GET'], url_path='history', detail=False)
-    def forecast_history(self, request):
+    @action(methods=['GET'], url_path='forecastday', detail=False)
+    def forecast_day(self, request):
         time_interval = get_time_inteval(request)
 
         now = datetime.now()
@@ -146,9 +142,7 @@ class PowerForecastViewSet(viewsets.ModelViewSet):
     def power_forecast_history(self, request):
         time_begin, time_end = get_time_range(request)
 
-        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        forecast_data = PowerForecast.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        forecast_data = PowerForecast.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
 
         return Response(PowerForecastSerializer(forecast_data, many=True).data)
 
@@ -175,9 +169,7 @@ class YieldDayViewSet(viewsets.ModelViewSet):
     def yield_day_history(self, request):
         time_begin, time_end = get_time_range(request)
 
-        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        yield_data = YieldDay.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        yield_data = YieldDay.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
 
         return Response(YieldDaySerializer(yield_data, many=True).data)
 
@@ -199,9 +191,7 @@ class YieldMonthViewSet(viewsets.ModelViewSet):
     def yield_month_history(self, request):
         time_begin, time_end = get_time_range(request)
 
-        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        yield_data = YieldMonth.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        yield_data = YieldMonth.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
 
         return Response(YieldMonthSerializer(yield_data, many=True).data)
 
@@ -223,9 +213,7 @@ class YieldYearViewSet(viewsets.ModelViewSet):
     def yield_year_history(self, request):
         time_begin, time_end = get_time_range(request)
 
-        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        yield_data = YieldYear.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        yield_data = YieldYear.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
 
         return Response(YieldYearSerializer(yield_data, many=True).data)
 
@@ -246,9 +234,7 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
     def yield_minute_history(self, request):
         time_begin, time_end = get_time_range(request)
 
-        datetime_lte = datetime.strptime(time_begin, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        datetime_gte = datetime.strptime(time_end, '%Y-%m-%dT%H:%M:%S.%f-03:00')
-        yield_data = YieldMinute.objects.filter(timestamp__gte=datetime_gte, timestamp__lte=datetime_lte)
+        yield_data = YieldMinute.objects.filter(timestamp__gte=time_begin, timestamp__lte=time_end)
 
         return Response(YieldMinuteSerializer(yield_data, many=True).data)
 
@@ -265,13 +251,18 @@ class SettingsViewSet(viewsets.ModelViewSet):
 
         st, created = Settings.objects.get_or_create(id=1)
 
-        st.fault_vt_percentile = request.GET.get('fault_vt_percentile', st.fault_vt_percentile)
-        st.warning_vt_percentile = request.GET.get('warning_vt_percentile', st.warning_vt_percentile)
-        st.delt_vt = request.GET.get('delt_vt', st.delt_vt)
+        try:
+            st.fault_vt_percentile = request.data['fault_vt_percentile']
+            st.warning_vt_percentile = request.data['warning_vt_percentile']
+            st.delt_vt = request.data['delt_vt']
 
-        st.fault_cr_percentile = request.GET.get('fault_cr_percentile', st.fault_cr_percentile)
-        st.warning_cr_percentile = request.GET.get('warning_cr_percentile', st.warning_cr_percentile)
-        st.delt_cr = request.GET.get('delt_cr', st.delt_cr)
+            st.fault_cr_percentile = request.data['fault_cr_percentile']
+            st.warning_cr_percentile = request.data['warning_cr_percentile']
+            st.delt_cr = request.data['delt_cr']
+
+            st.save()
+        except:
+            return Response(status=400)
 
         return Response(status=200)
 
@@ -280,8 +271,12 @@ class SettingsViewSet(viewsets.ModelViewSet):
 
         st, created = Settings.objects.get_or_create(id=1)
 
-        st.fault_user_active = request.GET.get('fault_user_active', st.fault_user_active)
-        st.warning_user_active = request.GET.get('warning_user_active', st.warning_user_active)
+        try:
+            st.fault_user_active = request.data['fault_user_active']
+            st.warning_user_active = request.data['warning_user_active']
+            st.save()
+        except:
+            return Response(status=400)
 
         return Response(status=200)
 
@@ -290,7 +285,11 @@ class SettingsViewSet(viewsets.ModelViewSet):
 
         st, created = Settings.objects.get_or_create(id=1)
 
-        st.retraining_interval = request.GET.get('retraining_interval', st.retraining_interval)
+        try:
+            st.retraining_interval = request.data['retraining_interval']
+            st.save()
+        except:
+            return Response(status=400)
 
         return Response(status=200)
 
