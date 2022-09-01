@@ -1,12 +1,15 @@
-import json
-from venv import create
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets
 
-from pytz import timezone
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 
 from .util import (get_time_inteval,
     get_time_range,
@@ -41,14 +44,15 @@ from .models import (
 # Create your views here.
 
 class PVDataViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     queryset = PVData.objects.all()
     serializer_class = PVDataSerializer
 
     @action(methods=['GET'], url_path='status', detail=False)
     def pv_system_status(self, request):
         latest_data = PVDataSerializer(PVData.objects.latest('timestamp')).data
-
-        print(latest_data)
 
         time_now = datetime.now()
         time_data = datetime.strptime(latest_data['timestamp'], '%Y-%m-%dT%H:%M:%S.%f-03:00')
@@ -303,9 +307,32 @@ class SettingsViewSet(viewsets.ModelViewSet):
 class ExternalAPIViweSet(viewsets.ViewSet):
     @action(methods=['POST'], url_path='postdata', detail=False)
     def post_data(self, request):
-
         request_data = request.data
 
-        set_data.apply_async(args=[request_data], kwargs={}, queue='input_data')
+        try:
+            request_data['timestamp']
+            request_data['irradiation']
+            request_data['temperature_pv']
+            request_data['temperature_amb']
+            request_data['power_avr']
+            request_data['strings']
+
+            set_data.apply_async(args=[request_data], kwargs={}, queue='input_data')
+        except:
+            return Response(status=400)
 
         return Response(status=200)
+
+class CustomAuthToken(ObtainAuthToken):
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })

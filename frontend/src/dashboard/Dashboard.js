@@ -1,4 +1,6 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import axios from 'axios';
+import {API_URL, API_TOKEN} from "../network";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid';
@@ -24,6 +26,24 @@ export default function Dashboard(props) {
 
     const classes = useStyles();
 
+    const [timestamp, setTimestamp] = useState('');
+
+    useEffect(() => {
+      testget();
+    }, []);
+
+    const testget = () => {
+      (async () => {
+          await axios.get(API_URL + "/pvdata/latest/", {
+            headers: {
+              'Authorization': `Token ${API_TOKEN}` 
+            }
+          }).then((data) => {
+              setTimestamp(data.data.timestamp)
+          })
+      })();
+    }
+
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={3}>
@@ -31,9 +51,12 @@ export default function Dashboard(props) {
           <Grid item xs={12} md={4} lg={3}>
             <Card variant="outlined" className={classes.card}>
               <CardHeader
-                title="Yield today"
+                title="Test card"
               />
             </Card>
+            <CardContent>
+              {timestamp}
+            </CardContent>
           </Grid>
 
           <Grid item xs={12} md={8} lg={9}>

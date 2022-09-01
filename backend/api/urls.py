@@ -37,4 +37,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('externalapi/', include(external.urls)),
+    path('api-token-auth/', photovoltaic_views.CustomAuthToken.as_view())
 ]

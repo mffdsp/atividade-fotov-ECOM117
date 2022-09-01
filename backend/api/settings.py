@@ -27,8 +27,7 @@ SECRET_KEY = 'django-insecure-t@5ae5tw)z4&=*zgu5o^*&$vd#95(3vac$h%a0-l3p2he_j250
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -44,6 +43,7 @@ INSTALLED_APPS = [
     'photovoltaic',
     'django_celery_beat',
     'django_celery_results',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
