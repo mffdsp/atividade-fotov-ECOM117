@@ -78,7 +78,7 @@ def simulate_input(self):
     power4 = float(df.iloc[[index+4]]['Potencia_FV_Avg'])
     power5 = float(df.iloc[[index+5]]['Potencia_FV_Avg'])
 
-    simulate_model.apply_async(args=[datetime_now, power1, power2, power3, power4, power5], kwargs={}, queue='model')
+    simulate_model.apply_async(args=[datetime_now, power1, power2, power3, power4, power5], kwargs={}, queue='run_models')
 
 @shared_task(bind=True, max_retries=3)
 def simulate_model(self, datetime_now, power1, power2, power3, power4, power5):
@@ -175,7 +175,6 @@ def calculate_alerts_tresholds(self):
 
 @shared_task(bind=True, max_retries=3)
 def set_data(self, request_data):
-    print(request_data)
 
     strings_ref = []
 
@@ -196,7 +195,7 @@ def set_data(self, request_data):
         irradiation = 0 
 
     for string in request_data['strings']:
-        s = PVString.objects.create(name="S" + str(string['string_number']) + " " + request_data['timestamp'], 
+        string_obj = PVString.objects.create(name="S" + str(string['string_number']) + " " + request_data['timestamp'], 
                                 timestamp=data_timestamp,
                                 voltage=string['voltage'],
                                 current=string['current'],
@@ -204,7 +203,7 @@ def set_data(self, request_data):
                                 voltage_alert=alert_definition('VT', string['string_number'], temperature, string['voltage']),
                                 current_alert=alert_definition('CR', string['string_number'], irradiation, string['current']),
                                 string_number=string['string_number'])
-        strings_ref.append(s)
+        strings_ref.append(string_obj)
 
     data = PVData.objects.create(timestamp=data_timestamp,
                                 irradiation=request_data['irradiation'],
