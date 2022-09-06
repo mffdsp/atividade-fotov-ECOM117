@@ -1,6 +1,3 @@
-from calendar import month
-import json
-import string
 from celery import shared_task
 
 from datetime import datetime, timedelta
@@ -8,7 +5,9 @@ from pytz import timezone
 import numpy as np
 import random
 
-from .util import read_dat_file
+from api import settings
+
+from .util import read_dat_file, timestamp_aware, alert_definition
 
 from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, YieldMonth, YieldYear, YieldMinute, AlertTreshold, Settings
 from photovoltaic.serializers import PVDataSerializer
@@ -17,7 +16,7 @@ from photovoltaic.serializers import PVDataSerializer
 def simulate_input(self):
     df = read_dat_file("./photovoltaic/fixtures/test_day.dat")
 
-    tz = timezone('America/Sao_Paulo')
+    tz = timezone(settings.TIME_ZONE)
     datetime_now = tz.localize(datetime.now())
 
     index = datetime_now.hour*60 + datetime_now.minute
@@ -177,3 +176,79 @@ def calculate_alerts_tresholds(self):
 @shared_task(bind=True, max_retries=3)
 def set_data(self, request_data):
     print(request_data)
+
+    strings_ref = []
+
+    data_timestamp = timestamp_aware(request_data['timestamp'])
+
+    if request_data['temperature_pv'] is not None:
+        temperature = request_data['temperature_pv']
+    elif request_data['temperature_amb'] is not None:
+        temperature = request_data['temperature_amb']
+    else:
+        temperature = 0
+
+    print(temperature)
+
+    if request_data['irradiation'] is not None:
+        irradiation = request_data['irradiation']
+    else:
+        irradiation = 0 
+
+    for string in request_data['strings']:
+        s = PVString.objects.create(name="S" + str(string['string_number']) + " " + request_data['timestamp'], 
+                                timestamp=data_timestamp,
+                                voltage=string['voltage'],
+                                current=string['current'],
+                                power=string['power'],
+                                voltage_alert=alert_definition('VT', string['string_number'], temperature, string['voltage']),
+                                current_alert=alert_definition('CR', string['string_number'], irradiation, string['current']),
+                                string_number=string['string_number'])
+        strings_ref.append(s)
+
+    data = PVData.objects.create(timestamp=data_timestamp,
+                                irradiation=request_data['irradiation'],
+                                temperature_pv=request_data['temperature_pv'],
+                                temperature_amb=request_data['temperature_amb'])
+
+    data.strings.set(strings_ref)
+
+    day = data_timestamp.replace(hour=0, minute=0, second=0, microsecond=0)
+    yield_day, created = YieldDay.objects.get_or_create(timestamp=day)
+
+    if request_data['generation'] is None and request_data['power_avr'] is None:
+        power = 0
+        energy = 0
+    elif request_data['generation'] is None and request_data['power_avr'] is not None:
+        power = request_data['power_avr']
+        energy = request_data['power_avr']*(1/60)/1000
+    elif request_data['generation'] is not None and request_data['power_avr'] is None:
+        energy = request_data['generation'] - yield_day.yield_day
+        power = energy*60*1000
+    else:
+        power = request_data['power_avr']
+        energy = request_data['generation'] - yield_day.yield_day
+
+    data.power_avg = power
+    data.save()
+
+    yield_day.yield_day = yield_day.yield_day + energy #kWh
+    yield_day.yield_day_forecaste = 30 #TODO run generation forecast
+    yield_day.save()
+
+    yield_minute, created = YieldMinute.objects.get_or_create(timestamp=data_timestamp)
+    yield_minute.yield_minute = yield_day.yield_day #kWh
+    yield_minute.yield_day_forecaste = 30 #TODO run generation forecast
+    yield_minute.save()
+
+    month = day.replace(day=1)
+    yield_month, created = YieldMonth.objects.get_or_create(timestamp=month)
+    yield_month.yield_month = yield_month.yield_month + energy #kWh
+    yield_month.save()
+
+    year = month.replace(month=1)
+    yield_year, created = YieldYear.objects.get_or_create(timestamp=year)
+    yield_year.yield_year = yield_year.yield_year + (energy/1000) #MWh
+    yield_year.save()
+
+    #TODO run power prediction model

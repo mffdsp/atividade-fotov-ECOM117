@@ -5,6 +5,7 @@ class PVString(models.Model):
         ('NM', 'Normal'),
         ('WA', 'Warning'),
         ('FT', 'Fault'),
+        ('NR', 'Not Rated')
     ]
 
     name = models.CharField(max_length=1024, primary_key=True)

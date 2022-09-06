@@ -1,5 +1,10 @@
 import pandas as pd
+from pytz import timezone
 from datetime import datetime, timedelta
+
+from api import settings
+
+from .models import AlertTreshold, Settings
 
 def read_dat_file(filename):
     """
@@ -86,3 +91,30 @@ def generate_forecast_json(data):
     })
 
     return json_array
+
+def timestamp_aware(timestamp_string):
+    tz = timezone(settings.TIME_ZONE)
+    datetime_native = datetime.strptime(timestamp_string, '%Y-%m-%dT%H:%M:%S.%f-03:00')
+    datetime_aware = tz.localize(datetime_native)
+
+    return datetime_aware
+
+def alert_definition(alert_type, string_number, meteorological_value, value):
+    st = Settings.objects.get_or_create(id=1)
+
+    try:
+        threshold = AlertTreshold.objects.get(alert_type=alert_type, string_number=string_number, meteorological_value=round(meteorological_value))
+        
+        alert = 'NR'
+        
+        if threshold and st.alert_days_active:
+            if (value >= threshold.treshold_ft_max or value <= threshold.treshold_ft_min) and st.fault_user_active:
+                alert = 'FT'
+            elif (value >= threshold.treshold_wa_max or value <= threshold.treshold_wa_min) and st.warning_user_active:
+                alert = 'WA'
+            else:
+                alert = 'NM'
+    except:
+        alert = 'NR'
+
+    return alert

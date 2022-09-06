@@ -357,6 +357,7 @@ class ExternalAPIViweSet(viewsets.ViewSet):
             request_data['temperature_amb']
             request_data['power_avr']
             request_data['strings']
+            request_data['generation']
 
             set_data.apply_async(args=[request_data], kwargs={}, queue='input_data')
         except:
