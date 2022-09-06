@@ -11,6 +11,10 @@ from dateutil.relativedelta import relativedelta
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 
+from api import settings
+
+from .permissions import ReactPermission, ApiPermission
+
 from .util import (get_time_inteval,
     get_time_range,
     get_string_number,
@@ -44,8 +48,9 @@ from .models import (
 # Create your views here.
 
 class PVDataViewSet(viewsets.ModelViewSet):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    if not settings.DEBUG:
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsAuthenticated, ReactPermission]
 
     queryset = PVData.objects.all()
     serializer_class = PVDataSerializer
@@ -112,6 +117,10 @@ class PVDataViewSet(viewsets.ModelViewSet):
         return Response(PVDataSerializer(pv_data, many=True).data)
 
 class PVStringViewSet(viewsets.ModelViewSet):
+    if not settings.DEBUG:
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsAuthenticated, ReactPermission]
+
     queryset = PVString.objects.all()
     serializer_class = PVStringSerializer
 
@@ -125,6 +134,10 @@ class PVStringViewSet(viewsets.ModelViewSet):
         return Response(PVStringSerializer(pv_data, many=True).data)
 
 class PowerForecastViewSet(viewsets.ModelViewSet):
+    if not settings.DEBUG:
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsAuthenticated, ReactPermission]
+
     queryset = PowerForecast.objects.all()
     serializer_class = PowerForecastSerializer
 
@@ -151,6 +164,10 @@ class PowerForecastViewSet(viewsets.ModelViewSet):
         return Response(PowerForecastSerializer(forecast_data, many=True).data)
 
 class YieldDayViewSet(viewsets.ModelViewSet):
+    if not settings.DEBUG:
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsAuthenticated, ReactPermission]
+
     queryset = YieldDay.objects.all()
     serializer_class = YieldDaySerializer
 
@@ -178,6 +195,10 @@ class YieldDayViewSet(viewsets.ModelViewSet):
         return Response(YieldDaySerializer(yield_data, many=True).data)
 
 class YieldMonthViewSet(viewsets.ModelViewSet):
+    if not settings.DEBUG:
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsAuthenticated, ReactPermission]
+
     queryset = YieldMonth.objects.all()
     serializer_class = YieldMonthSerializer
 
@@ -200,6 +221,10 @@ class YieldMonthViewSet(viewsets.ModelViewSet):
         return Response(YieldMonthSerializer(yield_data, many=True).data)
 
 class YieldYearViewSet(viewsets.ModelViewSet):
+    if not settings.DEBUG:
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsAuthenticated, ReactPermission]
+
     queryset = YieldYear.objects.all()
     serializer_class = YieldYearSerializer
 
@@ -222,6 +247,10 @@ class YieldYearViewSet(viewsets.ModelViewSet):
         return Response(YieldYearSerializer(yield_data, many=True).data)
 
 class YieldMinuteViewSet(viewsets.ModelViewSet):
+    if not settings.DEBUG:
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsAuthenticated, ReactPermission]
+
     queryset = YieldMinute.objects.all()
     serializer_class = YieldMinuteSerializer
 
@@ -243,10 +272,18 @@ class YieldMinuteViewSet(viewsets.ModelViewSet):
         return Response(YieldMinuteSerializer(yield_data, many=True).data)
 
 class AlertTresholdViewSet(viewsets.ModelViewSet):
+    if not settings.DEBUG:
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsAuthenticated, ReactPermission]
+
     queryset = AlertTreshold.objects.all()
     serializer_class = AlertTresholdSerializer
 
 class SettingsViewSet(viewsets.ModelViewSet):
+    if not settings.DEBUG:
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsAuthenticated, ReactPermission]
+    
     queryset = Settings.objects.all()
     serializer_class = SettingaSerializer
 
@@ -305,6 +342,10 @@ class SettingsViewSet(viewsets.ModelViewSet):
         return Response({'days_left': st.days_left})
 
 class ExternalAPIViweSet(viewsets.ViewSet):
+    if not settings.DEBUG:
+        authentication_classes = [TokenAuthentication]
+        permission_classes = [IsAuthenticated, ApiPermission]
+
     @action(methods=['POST'], url_path='postdata', detail=False)
     def post_data(self, request):
         request_data = request.data
