@@ -13,6 +13,21 @@ from photovoltaic.models import PVData, PVString, PowerForecast, YieldDay, Yield
 from photovoltaic.serializers import PVDataSerializer
 
 @shared_task(bind=True, max_retries=3)
+def data_to_sql(self):
+    df = read_dat_file("./photovoltaic/fixtures/test_day.dat")
+
+    conn = sqlite3.connect('photo_test_database') 
+    c = conn.cursor()
+    
+    c.execute('CREATE TABLE IF NOT EXISTS data (timestamp, radiacao, tensao_s1_avg)')
+    conn.commit()
+
+    df = df[['TIMESTAMP', 'Radiacao_Avg', 'Tensao_S1_Avg']]
+    df.to_sql('data', conn, if_exists='replace', index = False)
+
+    df.data_to_sql()
+  
+@shared_task(bind=True, max_retries=3)
 def simulate_input(self):
     df = read_dat_file("./photovoltaic/fixtures/test_day.dat")
 
