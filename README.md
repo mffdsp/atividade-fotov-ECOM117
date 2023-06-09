@@ -29,3 +29,20 @@ You can run a task to simulate the input of PV data in the Django admin page
 3. Put a name of your choice and select "photovoltaic.tasks.simulate_input" in Task (registered)
 4. Create a 1-minute Interval Schedule
 5. Lastly, save
+
+# Obtendo dados da estação
+
+Além disso, também foram feitas requisições dos dados da estação por meio do estudo da documentação do webservice e uso do playground disponível para testes (https://webservice.hobolink.com/ws/data/info/index.html#). Abaixo segue um passo a passo de como conseguimos obter esses dados:
+
+- Primeiro, obtivemos o access_token necessário para a requisição usando o seguinte comando: ```curl -i -H "Content-type: application/x-www-form-urlencoded" -H "Accept: application/json" -d "grant_type=client_credentials&client_id=PUT-HERE-YOUR-CLIENT-ID&client_secret=PUT-HERE-THE-CLIENT-SECRET" -X POST https://webservice.hobolink.com/ws/auth/token```
+
+- Depois, acesse o link do playground acima e insira os parâmetros necessários para a sua requisição. A figura abaixo ilustra uma requisição bem sucedida:
+
+Request:
+
+![image](https://github.com/mffdsp/atividade-fotov-ECOM117/assets/45469441/c6d13aff-7a01-439d-87e0-3b76290e6622)
+
+Response:
+
+![image](https://github.com/mffdsp/atividade-fotov-ECOM117/assets/45469441/2665d639-bc75-4d2f-8249-a8695a81b8b1)
+
