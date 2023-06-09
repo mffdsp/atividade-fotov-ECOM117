@@ -1,3 +1,7 @@
+# O que foi feito?
+
+Adicionamos a bibiloteca hoborequest (https://pypi.org/project/hoborequest/) visando utilizar a api para se conectar a hobo 
+Além disso foi desenvolvida a [task](https://github.com/mffdsp/atividade-fotov-ECOM117/blob/38be61c4faf40b524f58cc91dd707563d03b33d6/backend/photovoltaic/tasks.py#LL16C5-L16C16) reponsável por utilizar os dados de tests para criar um arquivo sql que pode ser consumido pelo front-end, por exemplo:
 # Softex - Photovoltaic forecaster
 This repository contains everything needed to deploy and run the project.  
   
